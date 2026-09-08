@@ -1,0 +1,123 @@
+% net: check
+
+# Check host reachable
+ping <host>
+
+# Check host reachable with retry
+ping -c <count> <host>
+
+# Check port open (TCP)
+nc -zv <host> <port>
+
+# Check port open (TCP) with timeout
+nc -zvw<timeout> <host> <port>
+
+# Check port open (UDP)
+nc -zvu <host> <port>
+
+# Check endpoint status
+curl -s -o /dev/null -w "%{http_code} (took %{time_total}s)\n" <url>
+
+# Check endpoint status with latency breakdown
+curl -s -o /dev/null -w "DNS: %{time_namelookup}s | Connect: %{time_connect}s | TLS: %{time_appconnect}s | Total: %{time_total}s\n" <url>
+
+
+% net: inspect
+
+# Inspect dns record
+dig +short <domain>
+
+# Inspect dns record with specific type
+dig +short <domain> <record_type>
+
+# Inspect dns record with full answer
+dig +noall +answer <domain> <record_type>
+
+# Inspect dns resolution with trace
+dig +trace <domain>
+
+# Inspect tls certificate
+openssl s_client -connect <host>:<port> -servername <host> 2>/dev/null | openssl x509 -noout -text
+
+# Inspect tls certificate with dates and subject
+openssl s_client -connect <host>:<port> -servername <host> 2>/dev/null | openssl x509 -noout -dates -subject -issuer
+
+# Inspect socket listening
+ss -tuln
+
+# Inspect socket listening with process
+ss -tulpn
+
+# Inspect socket connections with established state
+ss -tun state established
+
+# Inspect routing table
+ip route show
+
+# Inspect routing table with cache
+ip route show cache
+
+
+% net: trace
+
+# Trace route path
+traceroute <host>
+
+# Trace route path with numeric ip
+traceroute -n <host>
+
+# Trace route path with icmp echo
+traceroute -n -I <host>
+
+# Trace route path with continuous latency (mtr)
+mtr -rw <host>
+
+# Trace path mtu
+tracepath <host>
+
+
+% net: capture
+
+# Capture traffic on interface
+tcpdump -nn -i <interface>
+
+# Capture traffic on interface with packet count
+tcpdump -nn -i <interface> -c <count>
+
+# Capture traffic on interface with port filter
+tcpdump -nn -i <interface> port <port>
+
+# Capture traffic on interface with write to file
+tcpdump -nn -i <interface> -w <output_file>
+
+# Capture traffic on interface with ascii payload
+tcpdump -nn -A -i <interface>
+
+
+% net: measure
+
+# Measure network throughput (iperf3)
+iperf3 -c <server_ip>
+
+# Measure network throughput with specific port
+iperf3 -c <server_ip> -p <port>
+
+# Measure network throughput with udp bandwidth
+iperf3 -c <server_ip> -u -b <bandwidth>
+
+# Measure network throughput with parallel streams
+iperf3 -c <server_ip> -P <parallel>
+
+# Measure network throughput with reverse mode
+iperf3 -c <server_ip> -R
+
+
+# Dynamic variable providers for interactive selection
+$ record_type: echo "A AAAA CNAME TXT MX NS SRV SOA" | tr ' ' '\n'
+$ count: echo "4 10 20" | tr ' ' '\n'
+$ timeout: echo "2 5 10" | tr ' ' '\n'
+$ port: echo "80 443 53 8080 8443 22" | tr ' ' '\n'
+$ interface: ip -o link show | awk -F': ' '{print $2}'
+$ parallel: echo "2 4 8 16" | tr ' ' '\n'
+$ bandwidth: echo "10M 50M 100M 1G" | tr ' ' '\n'
+$ output_file: echo "/tmp/capture.pcap /tmp/debug.pcap" | tr ' ' '\n'
