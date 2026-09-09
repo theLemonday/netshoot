@@ -20,9 +20,16 @@ FROM alpine:3.20
 # - bind-tools: dig
 # - traceroute, mtr, tcpdump, iperf3, openssl, curl: core network stack
 # - zsh, bash, fzf: interactive shells and navi fuzzy search backend
-RUN apk add --no-cache \
+RUN set -ex \
+    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
+    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
+    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+    && apk update \
+    && apk upgrade \
+    && apk add --no-cache \
     bash \
     bind-tools \
+    ethtool \
     ca-certificates \
     curl \
     fzf \
@@ -34,7 +41,22 @@ RUN apk add --no-cache \
     openssl \
     tcpdump \
     traceroute \
-    zsh
+    iptables \
+    nftables \
+    zsh \
+    oh-my-zsh \
+    starship \
+    openssh \
+    neovim \
+    git \
+    jq
+
+RUN curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh
+RUN git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+COPY motd motd
+COPY zshrc .zshrc
+COPY bashrc .bashrc
+COPY starship.toml /root/.config/starship.toml
 
 # Copy the compiled binary from the builder stage
 COPY --from=navi-builder /usr/local/cargo/bin/navi /usr/local/bin/navi
@@ -44,10 +66,6 @@ ENV NAVI_PATH=/root/.local/share/navi/cheats
 
 # Inject the custom Vim-motion cheatsheet
 COPY cheats/ "${NAVI_PATH}/custom/"
-
-# Enable shell integration
-RUN echo 'eval "$(navi widget zsh)"' >> /root/.zshrc && \
-    echo 'eval "$(navi widget bash)"' >> /root/.bashrc
 
 WORKDIR /root
 CMD ["/bin/zsh"]

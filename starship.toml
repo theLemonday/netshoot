@@ -1,0 +1,18 @@
+# Main layout
+# format = """$directory$git_branch$git_status$python$golang$lua$nodejs$nix_shell$fill$kubernetes
+# $character"""
+
+add_newline = true
+
+# [fill]
+# symbol = " "
+
+# [git_branch]
+# symbol = ""
+
+[cmd_duration]
+disabled = true
+
+# [kubernetes]
+# disabled = false
+# format = '[$symbol$context(\($namespace\))]($style)'
