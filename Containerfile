@@ -49,10 +49,15 @@ RUN set -ex \
     openssh \
     neovim \
     git \
+    kubectl \
+    fd \
     jq
 
 RUN curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
+WORKDIR /root
+
 COPY motd motd
 COPY zshrc .zshrc
 COPY bashrc .bashrc
@@ -61,11 +66,7 @@ COPY starship.toml /root/.config/starship.toml
 # Copy the compiled binary from the builder stage
 COPY --from=navi-builder /usr/local/cargo/bin/navi /usr/local/bin/navi
 
-# Set navi discovery paths
-ENV NAVI_PATH=/root/.local/share/navi/cheats
-
 # Inject the custom Vim-motion cheatsheet
-COPY cheats/ "${NAVI_PATH}/custom/"
+COPY cheats/ "/root/.local/share/navi/cheats/custom/"
 
-WORKDIR /root
 CMD ["/bin/zsh"]
