@@ -64,10 +64,7 @@ COPY zshrc .zshrc
 COPY bashrc .bashrc
 COPY starship.toml /root/.config/starship.toml
 
-# Copy the compiled binary from the builder stage
 COPY --from=navi-builder /usr/local/cargo/bin/navi /usr/local/bin/navi
-
-# Inject the custom Vim-motion cheatsheet
 COPY cheats/ "/root/.local/share/navi/cheats/custom/"
 
 CMD ["/bin/zsh"]
