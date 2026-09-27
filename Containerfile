@@ -50,6 +50,7 @@ RUN set -ex \
     neovim \
     git \
     kubectl \
+    util-linux \
     fd \
     jq
 
