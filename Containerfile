@@ -52,6 +52,7 @@ RUN set -ex \
     kubectl \
     util-linux \
     fd \
+    bat \
     jq
 
 RUN curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh
