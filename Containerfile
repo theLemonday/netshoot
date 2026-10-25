@@ -1,14 +1,4 @@
 # ---------------------------------------------------------
-# Stage 1: Build the latest navi binary from source
-# ---------------------------------------------------------
-FROM rust:alpine AS navi-builder
-
-RUN apk add --no-cache musl-dev git
-
-# Install the latest release directly from crates.io
-RUN cargo install navi --locked
-
-# ---------------------------------------------------------
 # Stage 2: Minimal runtime diagnostic environment
 # ---------------------------------------------------------
 FROM alpine:3.20
@@ -53,19 +43,19 @@ RUN set -ex \
     util-linux \
     fd \
     bat \
-    jq
+    jq \
+    navi
 
 RUN curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh
-RUN git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+ADD https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 
 WORKDIR /root
 
 COPY motd motd
 COPY zshrc .zshrc
 COPY bashrc .bashrc
-COPY starship.toml /root/.config/starship.toml
+COPY config/ /root/.config
 
-COPY --from=navi-builder /usr/local/cargo/bin/navi /usr/local/bin/navi
-COPY cheats/ "/root/.local/share/navi/cheats/custom/"
+ADD https://github.com/theLemonday/cheats.git /root/.local/share/navi/cheats/
 
 CMD ["/bin/zsh"]
